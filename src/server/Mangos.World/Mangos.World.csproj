@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="7.0.1" />
+    <PackageReference Include="Autofac" Version="8.4.0" />
     <PackageReference Include="System.CodeDom" Version="9.0.10" />
   </ItemGroup>
 
