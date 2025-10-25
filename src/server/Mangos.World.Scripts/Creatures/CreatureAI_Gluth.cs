@@ -179,16 +179,16 @@ public class CreatureAI_Gluth : WS_Creatures_AI.BossAI
         aiCreature.SendChatMessage("I have successfully been slain. Good job!", ChatMsg.CHAT_MSG_YELL, LANGUAGES.LANG_GLOBAL);
     }
 
-    public void SpawnZombieChow(int Count)
-    {
-        for (int i = 1, loopTo = Count; i <= loopTo; i++)
-        {
-            if (Zombie_Chow_CD <= 0)
-            {
-                aiCreature.SpawnCreature(16360, 3267.9f, -3172.1f, 297.42f);
-            }
-        }
-    }
+    // public void SpawnZombieChow(int count)
+    // {
+    //     for (var i = 1;  i <= count; i++)
+    //     {
+    //         if (Zombie_Chow_CD <= 0)
+    //         {
+    //             aiCreature.SpawnCreature(16360, 3267.9f, -3172.1f, 297.42f);
+    //         }
+    //     }
+    // }
 
     // Gluth falls under Naxxramas without this. Not perfect but much better than before. Please note this was tested on a server with no vmaps/maps and that may be why he falls under Naxxramas.
     public override void OnLeaveCombat(bool Reset = true)
