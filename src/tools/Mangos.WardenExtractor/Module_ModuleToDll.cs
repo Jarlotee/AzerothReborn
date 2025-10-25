@@ -237,7 +237,7 @@ public static class Module_ModuleToDll
         var newData = new byte[(DataLen + bKey.Length)];
         Array.Copy(Data, 0, newData, 0, DataLen);
         Array.Copy(bKey, 0, newData, DataLen, bKey.Length);
-        SHA1Managed sha1 = new();
+        var sha1 = SHA1.Create();
         digest = sha1.ComputeHash(newData);
         Array.Copy(digest, 0, properResult, 0, digest.Length);
         for (int i = 0, loopTo2 = result.Length - 1; i <= loopTo2; i++)
@@ -271,7 +271,7 @@ public static class Module_ModuleToDll
         var newData = new byte[(DataLen + bKey.Length)];
         Array.Copy(Data, 0, newData, 0, DataLen);
         Array.Copy(bKey, 0, newData, DataLen, bKey.Length);
-        SHA1Managed sha1 = new();
+        var sha1 = SHA1.Create();
         digest = sha1.ComputeHash(newData);
         Array.Copy(digest, 0, properResult, 0, digest.Length);
         BigInteger power = new(new byte[] { 0x1, 0x3, 0x3, 0x7, 0x0, 0xD, 0xE, 0xA, 0xD, 0xF, 0x0, 0x0, 0xD }, true); // Notice our own little private key (original wow clients won't accept this)

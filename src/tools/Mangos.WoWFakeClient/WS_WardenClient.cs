@@ -66,7 +66,7 @@ public static class WS_WardenClient
         public MaievData(byte[] seed)
         {
             // Initialization
-            SHA1Managed sha1 = new();
+            var sha1 = SHA1.Create();
             source1 = sha1.ComputeHash(seed, 0, 20);
             source2 = sha1.ComputeHash(seed, 20, 20);
             Update();
@@ -75,7 +75,7 @@ public static class WS_WardenClient
         public void Update()
         {
             var buffer1 = new byte[60];
-            SHA1Managed sha1 = new();
+            var sha1 = SHA1.Create();
             Buffer.BlockCopy(source1, 0, buffer1, 0, 20);
             Buffer.BlockCopy(data, 0, buffer1, 20, 20);
             Buffer.BlockCopy(source2, 0, buffer1, 40, 20);
@@ -379,7 +379,7 @@ public static class WS_WardenClient
             var newData = new byte[(DataLen + bKey.Length)];
             Array.Copy(Data, 0, newData, 0, DataLen);
             Array.Copy(bKey, 0, newData, DataLen, bKey.Length);
-            SHA1Managed sha1 = new();
+            var sha1 = SHA1.Create();
             digest = sha1.ComputeHash(newData);
             Array.Copy(digest, 0, properResult, 0, digest.Length);
             for (int i = 0, loopTo2 = result.Length - 1; i <= loopTo2; i++)
@@ -576,13 +576,6 @@ public static class WS_WardenClient
         private int ppFuncList;
         private WardenFuncList myWardenList;
         private int pWardenList;
-        private GCHandle gchSendPacket;
-        private GCHandle gchCheckModule;
-        private GCHandle gchModuleLoad;
-        private GCHandle gchAllocateMem;
-        private GCHandle gchReleaseMem;
-        private GCHandle gchSetRC4Data;
-        private GCHandle gchGetRC4Data;
 
         private bool InitModule(ref byte[] Data)
         {

@@ -310,33 +310,26 @@ internal static class Realmserver
                     int RealmCount = Packet.GetInt8();
                     if (RealmCount > 0)
                     {
-                        for (int i = 1, loopTo = RealmCount; i <= loopTo; i++)
+                        var RealmType = Packet.GetInt8();
+                        var RealmLocked = Packet.GetInt8();
+                        var Unk1 = Packet.GetInt8();
+                        var Unk2 = Packet.GetInt8();
+                        var RealmStatus = Packet.GetInt8();
+                        var RealmName = Packet.GetString();
+                        var RealmIP = Packet.GetString();
+                        var RealmPopulation = Packet.GetFloat();
+                        var RealmCharacters = Packet.GetInt8();
+                        var RealmTimezone = Packet.GetInt8();
+                        var Unk3 = Packet.GetInt8();
+                        Console.WriteLine("[{0}][Realm] Connecting to realm [{1}][{2}].", Strings.Format(DateAndTime.TimeOfDay, "HH:mm:ss"), RealmName, RealmIP);
+                        if (Strings.InStr(RealmIP, ":") > 0)
                         {
-                            var RealmType = Packet.GetInt8();
-                            var RealmLocked = Packet.GetInt8();
-                            var Unk1 = Packet.GetInt8();
-                            var Unk2 = Packet.GetInt8();
-                            var RealmStatus = Packet.GetInt8();
-                            var RealmName = Packet.GetString();
-                            var RealmIP = Packet.GetString();
-                            var RealmPopulation = Packet.GetFloat();
-                            var RealmCharacters = Packet.GetInt8();
-                            var RealmTimezone = Packet.GetInt8();
-                            var Unk3 = Packet.GetInt8();
-                            Console.WriteLine("[{0}][Realm] Connecting to realm [{1}][{2}].", Strings.Format(DateAndTime.TimeOfDay, "HH:mm:ss"), RealmName, RealmIP);
-                            if (Strings.InStr(RealmIP, ":") > 0)
+                            var SplitIP = Strings.Split(RealmIP, ":");
+                            if (SplitIP.Length == 2)
                             {
-                                var SplitIP = Strings.Split(RealmIP, ":");
-                                if (SplitIP.Length == 2)
+                                if (Information.IsNumeric(SplitIP[1]))
                                 {
-                                    if (Information.IsNumeric(SplitIP[1]))
-                                    {
-                                        Worldserver.ConnectToServer(SplitIP[0], Conversions.ToInteger(SplitIP[1]));
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("[{0}][Realm] Invalid IP in realmlist [{1}].", Strings.Format(DateAndTime.TimeOfDay, "HH:mm:ss"), RealmIP);
-                                    }
+                                    Worldserver.ConnectToServer(SplitIP[0], Conversions.ToInteger(SplitIP[1]));
                                 }
                                 else
                                 {
@@ -347,8 +340,10 @@ internal static class Realmserver
                             {
                                 Console.WriteLine("[{0}][Realm] Invalid IP in realmlist [{1}].", Strings.Format(DateAndTime.TimeOfDay, "HH:mm:ss"), RealmIP);
                             }
-
-                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("[{0}][Realm] Invalid IP in realmlist [{1}].", Strings.Format(DateAndTime.TimeOfDay, "HH:mm:ss"), RealmIP);
                         }
                     }
                     else
@@ -378,7 +373,7 @@ internal static class Realmserver
         Array.Reverse(A);
         var tempStr = Account.ToUpper() + ":" + Password.ToUpper();
         var temp = Encoding.ASCII.GetBytes(tempStr.ToCharArray());
-        SHA1Managed algorithm1 = new();
+        var algorithm1 = SHA1.Create();
         temp = algorithm1.ComputeHash(temp);
         var X = algorithm1.ComputeHash(Concat(Salt, temp));
         Array.Reverse(X);

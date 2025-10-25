@@ -45,7 +45,7 @@ public static class WS_Auth
         temp = Realmserver.Concat(temp, BitConverter.GetBytes(Worldserver.ClientSeed));
         temp = Realmserver.Concat(temp, BitConverter.GetBytes(Worldserver.ServerSeed));
         temp = Realmserver.Concat(temp, Realmserver.SS_Hash);
-        SHA1Managed algorithm1 = new();
+        var algorithm1 = SHA1.Create();
         var ShaDigest = algorithm1.ComputeHash(temp);
         Worldserver.Decoding = true;
         VBMath.Randomize();
@@ -99,41 +99,34 @@ public static class WS_Auth
         var NumChars = Packet.GetInt8();
         if (NumChars > 0)
         {
-            for (byte i = 1, loopTo = NumChars; i <= loopTo; i++)
-            {
-                var GUID = Packet.GetUInt64();
-                var Name = Packet.GetString();
-                var Race = Packet.GetInt8();
-                var Classe = Packet.GetInt8();
-                var Gender = Packet.GetInt8();
-                var Skin = Packet.GetInt8();
-                var Face = Packet.GetInt8();
-                var HairStyle = Packet.GetInt8();
-                var HairColor = Packet.GetInt8();
-                var FacialHair = Packet.GetInt8();
-                var Level = Packet.GetInt8();
-                var Zone = Packet.GetInt32();
-                var Map = Packet.GetInt32();
-                var PosX = Packet.GetFloat();
-                var PosY = Packet.GetFloat();
-                var PosZ = Packet.GetFloat();
-                var GuildID = Packet.GetUInt32();
-                var PlayerState = Packet.GetUInt32();
-                var RestState = Packet.GetInt8();
-                var PetInfoID = Packet.GetUInt32();
-                var PetLevel = Packet.GetUInt32();
-                var PetFamilyID = Packet.GetUInt32();
-                Console.WriteLine("[{0}][World] Logging in with character [{1}].", Strings.Format(DateAndTime.TimeOfDay, "HH:mm:ss"), Name);
-                Worldserver.CharacterGUID = GUID;
-                Packets.PacketClass Response = new(OPCODES.CMSG_PLAYER_LOGIN);
-                Response.AddUInt64(GUID);
-                Worldserver.Send(Response);
-                Response.Dispose();
-                break;
-
-                // Skip the equipment
-                Packet.Offset += 20 * 9;
-            }
+            var GUID = Packet.GetUInt64();
+            var Name = Packet.GetString();
+            var Race = Packet.GetInt8();
+            var Classe = Packet.GetInt8();
+            var Gender = Packet.GetInt8();
+            var Skin = Packet.GetInt8();
+            var Face = Packet.GetInt8();
+            var HairStyle = Packet.GetInt8();
+            var HairColor = Packet.GetInt8();
+            var FacialHair = Packet.GetInt8();
+            var Level = Packet.GetInt8();
+            var Zone = Packet.GetInt32();
+            var Map = Packet.GetInt32();
+            var PosX = Packet.GetFloat();
+            var PosY = Packet.GetFloat();
+            var PosZ = Packet.GetFloat();
+            var GuildID = Packet.GetUInt32();
+            var PlayerState = Packet.GetUInt32();
+            var RestState = Packet.GetInt8();
+            var PetInfoID = Packet.GetUInt32();
+            var PetLevel = Packet.GetUInt32();
+            var PetFamilyID = Packet.GetUInt32();
+            Console.WriteLine("[{0}][World] Logging in with character [{1}].", Strings.Format(DateAndTime.TimeOfDay, "HH:mm:ss"), Name);
+            Worldserver.CharacterGUID = GUID;
+            Packets.PacketClass Response = new(OPCODES.CMSG_PLAYER_LOGIN);
+            Response.AddUInt64(GUID);
+            Worldserver.Send(Response);
+            Response.Dispose();
         }
         else
         {
