@@ -114,7 +114,7 @@ internal sealed class SocketReader
         if (number != length)
         {
             Debugger.Launch();
-            throw new NotImplementedException();
+            throw new Exception("There was no data to read");
         }
     }
 }
