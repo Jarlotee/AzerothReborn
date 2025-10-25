@@ -67,5 +67,9 @@ internal sealed class ConnectionFactory
             mySqlConnection.Execute(test_accounts_script);
 #endif
         }
+        else
+        {
+            mySqlConnection.ChangeDatabase(databaseName);
+        }
     }
 }
