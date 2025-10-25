@@ -115,7 +115,9 @@ public partial class WS_Network
                                     {
                                         var handlePacket = WorldServiceLocator.WorldServer.PacketHandlers[packet.OpCode];
                                         var client = this;
+#pragma warning disable CS0728
                                         handlePacket(ref packet, ref client);
+#pragma warning restore CS0728
 
                                         if (WorldServiceLocator.NativeMethods.timeGetTime("") - start > 100)
                                         {

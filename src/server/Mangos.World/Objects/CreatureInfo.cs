@@ -33,8 +33,6 @@ public class CreatureInfo : IDisposable
 {
     private bool _disposedValue;
 
-    private readonly bool found_;
-
     public int Id;
 
     public string Name;
@@ -204,10 +202,8 @@ public class CreatureInfo : IDisposable
         if (MySQLQuery.Rows.Count == 0)
         {
             WorldServiceLocator.WorldServer.Log.WriteLine(LogType.FAILED, "CreatureID {0} not found in SQL database.", CreatureID);
-            found_ = false;
             return;
         }
-        found_ = true;
         ModelA1 = MySQLQuery.Rows[0].As<int>("modelid1");
         ModelA2 = MySQLQuery.Rows[0].As<int>("Modelid2");
         ModelH1 = MySQLQuery.Rows[0].As<int>("modelid3");
@@ -300,7 +296,6 @@ public class CreatureInfo : IDisposable
 
     public CreatureInfo()
     {
-        found_ = false;
         Id = 0;
         Name = "MISSING_CREATURE_INFO";
         SubName = "";

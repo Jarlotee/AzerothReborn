@@ -123,14 +123,6 @@ public class WS_Transports
 
         private int NextWaypoint;
 
-        private int NextNodeTime;
-
-        private readonly int TimeToNextEvent;
-
-        private readonly TransportStates TransportState;
-
-        private readonly byte TransportAt;
-
         public TransportObject(int ID_, string Name, int Period_)
             : base(ID_, WorldServiceLocator.WSTransports.GetNewGUID())
         {
@@ -143,10 +135,6 @@ public class WS_Transports
             LastStop = -1;
             CurrentWaypoint = 0;
             NextWaypoint = 0;
-            NextNodeTime = 0;
-            TimeToNextEvent = 0;
-            TransportState = TransportStates.TRANSPORT_DOCKED;
-            TransportAt = 0;
             TransportName = Name;
             Period = Period_;
             if (GenerateWaypoints())
@@ -158,8 +146,6 @@ public class WS_Transports
                 orientation = 1f;
                 VisibleDistance = 99999f;
                 State = GameObjectLootState.DOOR_CLOSED;
-                TransportState = TransportStates.TRANSPORT_DOCKED;
-                TimeToNextEvent = 60000;
                 WorldServiceLocator.WorldServer.WORLD_TRANSPORTs_Lock.AcquireWriterLock(-1);
                 WorldServiceLocator.WorldServer.WORLD_TRANSPORTs.Add(GUID, this);
                 WorldServiceLocator.WorldServer.WORLD_TRANSPORTs_Lock.ReleaseWriterLock();
@@ -338,7 +324,6 @@ public class WS_Transports
                     CurrentWaypoint = GetNextWaypoint();
                     NextWaypoint = GetNextWaypoint();
                     PathTime = t;
-                    NextNodeTime = Waypoints[CurrentWaypoint].Time;
                     return true;
                 }
                 return false;
@@ -424,7 +409,6 @@ public class WS_Transports
                             break;
                     }
                 }
-                NextNodeTime = Waypoints[CurrentWaypoint].Time;
                 if (CurrentWaypoint == 0)
                 {
                     break;
@@ -623,7 +607,9 @@ public class WS_Transports
                                             cHARACTERs[key] = Character;
                                             var updateClass = tmpUpdate;
                                             WS_GameObjects.GameObject updateObject = this;
+#pragma warning disable CS0728
                                             updateClass.AddToPacket(ref packet, ObjectUpdateType.UPDATETYPE_CREATE_OBJECT, ref updateObject);
+#pragma warning restore CS0728
                                         }
                                         finally
                                         {
@@ -632,7 +618,9 @@ public class WS_Transports
 
                                         if (WorldServiceLocator.WorldServer.CHARACTERs.TryGetValue(plGUID, out var _character))
                                         {
+#pragma warning disable CS0728
                                             _character?.client?.SendMultiplyPackets(ref packet);
+#pragma warning restore CS0728
                                             _character?.gameObjectsNear?.Add(GUID);
                                             SeenBy?.Add(plGUID);
                                         }

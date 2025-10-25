@@ -33,12 +33,10 @@ public class WcNetwork
 
     public WorldServerClass WorldServer => _clusterServiceLocator.WorldServerClass;
 
-    private readonly int _lastPing;
-
     public int MsTime()
     {
         // DONE: Calculate the clusters timeGetTime("")
-        return _clusterServiceLocator.NativeMethods.timeGetTime("") - _lastPing;
+        return _clusterServiceLocator.NativeMethods.timeGetTime("") - 0;
     }
 
     public Dictionary<uint, DateTime> LastConnections = new();

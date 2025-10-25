@@ -218,22 +218,6 @@ public partial class WS_Warden
 
         private int pWardenList;
 
-        private GCHandle gchSendPacket;
-
-        private GCHandle gchCheckModule;
-
-        private GCHandle gchModuleLoad;
-
-        private GCHandle gchAllocateMem;
-
-        private GCHandle gchReleaseMem;
-
-        private GCHandle gchSetRC4Data;
-
-        private GCHandle gchGetRC4Data;
-
-        private int m_RC4;
-
         private byte[] m_PKT;
 
         private bool _disposedValue;
@@ -269,9 +253,7 @@ public partial class WS_Warden
             myFunctionList = default;
             pFuncList = 0;
             ppFuncList = 0;
-            myWardenList = default;
             pWardenList = 0;
-            m_RC4 = 0;
             m_PKT = Array.Empty<byte>();
         }
 
@@ -938,14 +920,12 @@ public partial class WS_Warden
                 {
                     Marshal.WriteByte(new IntPtr(lpBuffer + i), 0);
                 }
-                m_RC4 = lpBuffer;
                 return 1;
             }
         }
 
         public void GenerateNewRC4Keys(byte[] K)
         {
-            m_RC4 = 0;
             var pK = WorldServiceLocator.WSWarden.ByteArrPtr(ref K);
             GenerateRC4Keys(m_ModMem, pK, K.Length);
             WorldServiceLocator.WSWarden.Free(pK);

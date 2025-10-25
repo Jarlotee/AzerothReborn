@@ -197,10 +197,6 @@ public class WS_Handlers_Warden
         }
     }
 
-    private readonly int OutKeyAdr;
-
-    private readonly int InKeyAdr;
-
     public void On_CMSG_WARDEN_DATA(ref Packets.PacketClass packet, ref WS_Network.ClientClass client)
     {
         var b = new byte[checked(packet.Data.Length - 6 - 1 + 1)];

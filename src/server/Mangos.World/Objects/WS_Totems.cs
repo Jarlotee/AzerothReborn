@@ -19,7 +19,6 @@
 using Mangos.Common.Enums.Global;
 using Mangos.Common.Enums.Spell;
 using Mangos.World.Player;
-using Mangos.World.Spells;
 using System.Collections.Generic;
 
 namespace Mangos.World.Objects;
@@ -32,14 +31,12 @@ public class WS_Totems
 
         public int Duration;
 
-        private readonly TotemType Type;
 
         public TotemObject(int Entry, float PosX, float PosY, float PosZ, float Orientation, int Map, int Duration_ = 0)
             : base(Entry, PosX, PosY, PosZ, Orientation, Map, Duration_)
         {
             Caster = null;
             Duration = 0;
-            Type = TotemType.TOTEM_PASSIVE;
             aiScript?.Dispose();
             aiScript = null;
             Duration = Duration_;

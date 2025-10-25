@@ -38,8 +38,6 @@ public class WS_Items
 {
     public class ItemInfo : IDisposable
     {
-        private readonly bool _found;
-
         private bool _disposedValue;
 
         public readonly int Model;
@@ -399,7 +397,6 @@ public class WS_Items
 
         private ItemInfo()
         {
-            _found = false;
             Model = 0;
             Name = "Unknown Item";
             Quality = 0;
@@ -479,10 +476,8 @@ public class WS_Items
             if (mySqlQuery.Rows.Count == 0)
             {
                 WorldServiceLocator.WorldServer.Log.WriteLine(LogType.FAILED, "ItemID {0} not found in SQL database! Loading default \"Unknown Item\" info.", itemId);
-                _found = false;
                 return;
             }
-            _found = true;
             Model = mySqlQuery.Rows[0].As<int>("displayid");
             Name = mySqlQuery.Rows[0].As<string>("name");
             Quality = mySqlQuery.Rows[0].As<int>("quality");

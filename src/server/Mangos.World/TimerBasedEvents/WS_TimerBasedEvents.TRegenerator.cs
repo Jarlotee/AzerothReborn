@@ -18,10 +18,8 @@
 
 using Mangos.Common.Enums.Global;
 using Mangos.Common.Enums.Player;
-using Mangos.World.Player;
 using Microsoft.VisualBasic.CompilerServices;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Mangos.World.Server;
@@ -33,8 +31,6 @@ public partial class WS_TimerBasedEvents
         private Timer RegenerationTimer;
 
         private bool RegenerationWorking;
-
-        private readonly int operationsCount;
 
         private int BaseMana;
 
