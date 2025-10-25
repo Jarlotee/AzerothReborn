@@ -24,7 +24,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
 
 namespace Mangos.Extractor;
 
@@ -129,7 +128,7 @@ public static class Functions
         }
         catch (Exception e)
         {
-            MessageBox.Show("ReadString has thrown an Exception! The string is {0}", e.Message);
+            Console.Error.WriteLine("ReadString has thrown an Exception! The string is {0}", e.Message);
         }
 
         return r;
@@ -287,9 +286,7 @@ public static class Functions
         var FIELD_NAME_OFFSET = SearchInFile(f, "CORPSE_FIELD_PAD");
         var OBJECT_FIELD_GUID = SearchInFile(f, "OBJECT_FIELD_GUID") + 0x400000;
         var FIELD_TYPE_OFFSET = SearchInFile(f, OBJECT_FIELD_GUID);
-#if DEBUG
-        MessageBox.Show("FIELD_NAME_OFFSET " + FIELD_NAME_OFFSET + " OBJECT_FIELD_GUID " + OBJECT_FIELD_GUID + " FIELD_TYPE_OFFSET " + FIELD_TYPE_OFFSET);
-#endif
+
         if (FIELD_NAME_OFFSET == -1) // pre 1.5 vanilla support
         {
             FIELD_NAME_OFFSET = SearchInFile(f, "CORPSE_FIELD_FLAGS");
@@ -307,7 +304,7 @@ public static class Functions
         }
         if (FIELD_NAME_OFFSET == -1 || FIELD_TYPE_OFFSET == -1)
         {
-            MessageBox.Show("Wrong offsets! " + FIELD_NAME_OFFSET + "  " + FIELD_TYPE_OFFSET);
+            Console.WriteLine("Wrong offsets! " + FIELD_NAME_OFFSET + "  " + FIELD_TYPE_OFFSET);
         }
         else
         {
@@ -357,7 +354,7 @@ public static class Functions
                 Info.Add(tmp);
             }
 
-            MessageBox.Show(string.Format("{0} fields extracted.", Names.Count));
+            Console.WriteLine(string.Format("{0} fields extracted.", Names.Count));
             w.WriteLine("// Auto generated file");
             w.WriteLine("// {0}", DateAndTime.Now);
             w.WriteLine("// Patch: " + versInfo.FileMajorPart + "." + versInfo.FileMinorPart + "." + versInfo.FileBuildPart);
@@ -413,9 +410,7 @@ public static class Functions
 
                         w.WriteLine("Public Enum E" + sField + "Fields");
                         w.WriteLine("{");
-#if DEBUG
-                        MessageBox.Show("sField: " + sField + "\nsName: " + sName);
-#endif
+
                         if (TBC == 1) // TBC support
                         {
                             if (sField.ToLower() == "item")
@@ -488,11 +483,11 @@ public static class Functions
         StreamReader r2 = new(f);
         FileStream o = new("Global.Opcodes.cs", FileMode.Create, FileAccess.Write, FileShare.None, 1024);
         StreamWriter w = new(o);
-        MessageBox.Show(ReadString(f, SearchInFile(f, "CMSG_REQUEST_PARTY_MEMBER_STATS")));
+        Console.WriteLine(ReadString(f, SearchInFile(f, "CMSG_REQUEST_PARTY_MEMBER_STATS")));
         var START = SearchInFile(f, "NUM_MSG_TYPES");
         if (START == -1)
         {
-            MessageBox.Show("Wrong offsets!");
+            Console.WriteLine("Wrong offsets!");
         }
         else
         {
@@ -505,7 +500,7 @@ public static class Functions
                 Names.Push(Last);
             }
 
-            MessageBox.Show(string.Format("{0} opcodes extracted.", Names.Count));
+            Console.WriteLine(string.Format("{0} opcodes extracted.", Names.Count));
             w.WriteLine("// Auto generated file");
             w.WriteLine("// {0}", DateAndTime.Now);
             w.WriteLine();
@@ -536,7 +531,7 @@ public static class Functions
         var REASON_NAME_OFFSET = SearchInFile(f, "SPELL_FAILED_UNKNOWN");
         if (REASON_NAME_OFFSET == -1)
         {
-            MessageBox.Show("Wrong offsets!");
+            Console.WriteLine("Wrong offsets!");
         }
         else
         {
@@ -553,7 +548,7 @@ public static class Functions
                 }
             }
 
-            MessageBox.Show(string.Format("{0} spell failed reasons extracted.", Names.Count));
+            Console.WriteLine(string.Format("{0} spell failed reasons extracted.", Names.Count));
             w.WriteLine("// Auto generated file");
             w.WriteLine("// {0}", DateAndTime.Now);
             w.WriteLine();
@@ -585,7 +580,7 @@ public static class Functions
         var START = SearchInFile(f, "CHAT_MSG_RAID_WARNING");
         if (START == -1)
         {
-            MessageBox.Show("Wrong offsets!");
+            Console.WriteLine("Wrong offsets!");
         }
         else
         {
@@ -602,7 +597,7 @@ public static class Functions
                 }
             }
 
-            MessageBox.Show(string.Format("{0} chat types extracted.", Names.Count));
+            Console.WriteLine(string.Format("{0} chat types extracted.", Names.Count));
             w.WriteLine("// Auto generated file");
             w.WriteLine("// {0}", DateAndTime.Now);
             w.WriteLine();
