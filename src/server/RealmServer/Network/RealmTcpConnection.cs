@@ -52,6 +52,8 @@ internal sealed class RealmTcpConnection : ITcpConnection
 
     private async Task ExecuteMessageAsync(SocketReader reader, SocketWriter writer)
     {
+        if (!reader.HasData()) { return; }
+
         var opcode = (MessageOpcode)await reader.ReadByteAsync();
 
         var dispatcher = dispatchers.FirstOrDefault(x => x.Opcode == opcode);

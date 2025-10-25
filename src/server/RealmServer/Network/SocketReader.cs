@@ -36,6 +36,11 @@ internal sealed class SocketReader
         this.cancellationToken = cancellationToken;
     }
 
+    public bool HasData()
+    {
+        return socket.Available > 0;
+    }
+
     public async ValueTask ReadVoidAsync(int length)
     {
         var buffer = arrayPool.Rent(length);
