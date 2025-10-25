@@ -1,6 +1,7 @@
 ﻿{
-  "AccountDataBaseConnectionString": "Server=localhost;Port=3306;User ID=root;Password=rootpass;Database=mangosVBaccounts;Compress=false;Connection Timeout=5;",
   "Realm": {
+    "ConnectionString": "Server=localhost;Port=3306;User ID=root;Password=rootpass;Compress=false;Connection Timeout=5;",
+    "DatabaseName": "realm",
     "RealmServerEndpoint": "127.0.0.1:3724"
   },
   "Cluster": {

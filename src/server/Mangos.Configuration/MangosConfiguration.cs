@@ -20,8 +20,6 @@ namespace Mangos.Configuration;
 
 public sealed class MangosConfiguration
 {
-    public required string AccountDataBaseConnectionString { get; init; }
-
     public required RealmConfiguration Realm { get; init; }
     public required ClusterConfiguration Cluster { get; init; }
     public required WorldConfiguration World { get; init; }

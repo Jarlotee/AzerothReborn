@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
+using Dapper;
 using Mangos.Configuration;
 using Mangos.MySql.Connections;
 using MySql.Data.MySqlClient;
@@ -33,8 +34,38 @@ internal sealed class ConnectionFactory
 
     public AccountConnection ConnectToAccountDataBase()
     {
-        var mySqlConnection = new MySqlConnection(mangosConfiguration.AccountDataBaseConnectionString);
+        var mySqlConnection = new MySqlConnection(mangosConfiguration.Realm.ConnectionString);
         mySqlConnection.Open();
+        EnsureDatabase(mySqlConnection);
         return new AccountConnection(mySqlConnection);
+    }
+
+    private void EnsureDatabase(MySqlConnection mySqlConnection)
+    {
+        var databaseName = mangosConfiguration.Realm.DatabaseName;
+        var results = mySqlConnection.ExecuteReader(
+            "SHOW DATABASES LIKE @name;",
+            new { name = databaseName }
+        );
+
+        var exists = results.Read();
+        results.Close();
+
+        if (!exists)
+        {
+            mySqlConnection.Execute($"CREATE DATABASE {databaseName};");
+
+            mySqlConnection.ChangeDatabase(databaseName);
+
+            var realm_script = SqlScripts.ReadEmbeddedResource("Database", "realm.sql");
+
+            mySqlConnection.Execute(realm_script);
+
+#if DEBUG
+            var test_accounts_script = SqlScripts.ReadEmbeddedResource("Database", "test-accounts.sql");
+
+            mySqlConnection.Execute(test_accounts_script);
+#endif
+        }
     }
 }

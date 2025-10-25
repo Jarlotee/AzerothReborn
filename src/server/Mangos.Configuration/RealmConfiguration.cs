@@ -20,5 +20,8 @@ namespace Mangos.Configuration;
 
 public sealed class RealmConfiguration
 {
+    public required string ConnectionString { get; init; }
+    public required string DatabaseName { get; init; }
     public required string RealmServerEndpoint { get; init; }
+
 }
