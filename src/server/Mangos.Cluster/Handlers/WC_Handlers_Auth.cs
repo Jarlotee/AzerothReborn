@@ -191,35 +191,35 @@ public class WcHandlersAuth
         // Not needed already - in 1.11 addons list is removed.
 
         // DONE: Send packet
-        PacketClass addOnsEnable = new(Opcodes.SMSG_ADDON_INFO);
-        for (int i = 0, loopTo1 = addOnsNames.Count - 1; i <= loopTo1; i++)
-        {
-            if (File.Exists(string.Format(@"interface\{0}.pub", addOnsNames[i])) && addOnsHashes[i] != 0x1C776D01U)
-            {
-                // We have hash data
-                addOnsEnable.AddInt8(2);                    // AddOn Type [1-enabled, 0-banned, 2-blizzard]
-                addOnsEnable.AddInt8(1);                    // Unk
-                FileStream fs = new(string.Format(@"interface\{0}.pub", addOnsNames[i]), FileMode.Open, FileAccess.Read, FileShare.Read, 258, FileOptions.SequentialScan);
-                var fb = new byte[257];
-                fs.Read(fb, 0, 257);
+        // PacketClass addOnsEnable = new(Opcodes.SMSG_ADDON_INFO);
+        // for (int i = 0, loopTo1 = addOnsNames.Count - 1; i <= loopTo1; i++)
+        // {
+        //     if (File.Exists(string.Format(@"interface\{0}.pub", addOnsNames[i])) && addOnsHashes[i] != 0x1C776D01U)
+        //     {
+        //         // We have hash data
+        //         addOnsEnable.AddInt8(2);                    // AddOn Type [1-enabled, 0-banned, 2-blizzard]
+        //         addOnsEnable.AddInt8(1);                    // Unk
+        //         FileStream fs = new(string.Format(@"interface\{0}.pub", addOnsNames[i]), FileMode.Open, FileAccess.Read, FileShare.Read, 258, FileOptions.SequentialScan);
+        //         var fb = new byte[257];
+        //         fs.Read(fb, 0, 257);
 
-                // NOTE: Read from file
-                addOnsEnable.AddByteArray(fb);
-                addOnsEnable.AddInt32(0);
-                addOnsEnable.AddInt8(0);
-            }
-            else
-            {
-                // We don't have hash data or already sent to client
-                addOnsEnable.AddInt8(2);                    // AddOn Type [1-enabled, 0-banned, 2-blizzard]
-                addOnsEnable.AddInt8(1);                    // Unk
-                addOnsEnable.AddInt32(0);
-                addOnsEnable.AddInt16(0);
-            }
-        }
+        //         // NOTE: Read from file
+        //         addOnsEnable.AddByteArray(fb);
+        //         addOnsEnable.AddInt32(0);
+        //         addOnsEnable.AddInt8(0);
+        //     }
+        //     else
+        //     {
+        //         // We don't have hash data or already sent to client
+        //         addOnsEnable.AddInt8(2);                    // AddOn Type [1-enabled, 0-banned, 2-blizzard]
+        //         addOnsEnable.AddInt8(1);                    // Unk
+        //         addOnsEnable.AddInt32(0);
+        //         addOnsEnable.AddInt16(0);
+        //     }
+        // }
 
-        client.Send(addOnsEnable);
-        addOnsEnable.Dispose();
+        // client.Send(addOnsEnable);
+        // addOnsEnable.Dispose();
     }
 
     public void On_CMSG_PING(PacketClass packet, ClientClass client)
@@ -441,8 +441,8 @@ public class WcHandlersAuth
                 // DONE: Get items
                 var guid = mySqlQuery.Rows[i].As<long>("char_guid");
                 DataTable itemsMySqlQuery = new();
-                var characterDb = _clusterServiceLocator.WorldCluster.GetCharacterDatabase().SQLDBName;
-                var worldDb = _clusterServiceLocator.WorldCluster.GetWorldDatabase().SQLDBName;
+                var characterDb = _clusterServiceLocator.WorldCluster.GetCharacterDatabase().DBName();
+                var worldDb = _clusterServiceLocator.WorldCluster.GetWorldDatabase().DBName();
                 _clusterServiceLocator.WorldCluster.GetCharacterDatabase().Query(string.Format("SELECT item_slot, displayid, inventorytype FROM " + characterDb + ".characters_inventory, " + worldDb + ".item_template WHERE item_bag = {0} AND item_slot <> 255 AND entry = item_id  ORDER BY item_slot;", guid), ref itemsMySqlQuery);
                 var e = itemsMySqlQuery.Rows.GetEnumerator();
                 e.Reset();
