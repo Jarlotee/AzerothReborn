@@ -49,7 +49,7 @@ internal static class MainModule
         List<string> MPQFilesToOpen = new() { "terrain.MPQ", "dbc.MPQ", "misc.MPQ", "patch.MPQ", "patch-2.MPQ" };
         foreach (var mpq in MPQFilesToOpen)
         {
-            if (File.Exists(@"Data\" + mpq) == false)
+            if (File.Exists($"Data/{mpq}") == false)
             {
                 Console.WriteLine("Missing [{0}]. Make sure this extractor is put in your World of Warcraft directory.", mpq);
                 goto ExitNow;
@@ -59,7 +59,7 @@ internal static class MainModule
         Console.ForegroundColor = ConsoleColor.Yellow;
         foreach (var mpq in MPQFilesToOpen)
         {
-            var stream = File.Open(Path.GetFullPath(@"Data\" + mpq), FileMode.Open);
+            var stream = File.Open(Path.GetFullPath($"Data/{mpq}"), FileMode.Open);
             MpqArchive newArchive = new(stream, true);
             MPQArchives.Add(newArchive);
             Console.WriteLine("Loaded archive [{0}].", mpq);
@@ -68,7 +68,6 @@ internal static class MainModule
         try
         {
             Directory.CreateDirectory("dbc");
-            Directory.CreateDirectory("maps");
             Console.WriteLine("Created extract folders.");
         }
         catch (UnauthorizedAccessException)
@@ -93,14 +92,6 @@ internal static class MainModule
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Unable to extract DBC Files. Error: " + ex.Message);
         }
-
-    // Try
-    // ExtractMaps()
-    // Catch ex As Exception
-    // Console.ForegroundColor = ConsoleColor.Red
-    // Console.WriteLine("Unable to extract Maps. Error: " & ex.Message)
-    // GoTo ExitNow
-    // End Try
 
     ExitNow:
         ;
@@ -131,7 +122,8 @@ internal static class MainModule
             {
                 using (var mpqStream = mpqArchive.OpenFile(mpqFile))
                 {
-                    using var fileStream = File.Create(Path.Combine(dbcFolder, Path.GetFileName(mpqFile.Filename)));
+                    var path = Path.Combine(dbcFolder, mpqFile.Filename.Replace("DBFilesClient\\", ""));
+                    using var fileStream = File.Create(path);
                     mpqStream.CopyTo(fileStream);
                 }
 
