@@ -27,9 +27,8 @@ public sealed class WorldConfiguration
     public required string LocalConnectHost { get; init; }
     public required int LocalConnectPort { get; init; }
 
-    public required string AccountDatabase { get; init; }
-    public required string CharacterDatabase { get; init; }
-    public required string WorldDatabase { get; init; }
+    public required string ConnectionString { get; init; }
+    public required string DatabaseName { get; init; }
 
     public required ImmutableArray<int> Maps { get; init; }
     public required ImmutableArray<string> ScriptsCompiler { get; init; }

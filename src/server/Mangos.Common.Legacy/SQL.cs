@@ -26,35 +26,12 @@ namespace Mangos.Common.Legacy;
 
 public class SQL : IDisposable
 {
-    private MySqlConnection MySQLConn;
+    internal MySqlConnection _mySqlConn;
 
     public enum EMessages
     {
         ID_Error = 0,
         ID_Message = 1
-    }
-
-    public event SQLMessageEventHandler SQLMessage;
-
-    public delegate void SQLMessageEventHandler(EMessages MessageID, string OutBuf);
-
-    // <Description("Class info version/last date updated.")> _
-    // Public ReadOnly Property Class_Version_Info() As String
-    // Get
-    // Return "Version: " + VInfo + ", Updated at: " + rvDate
-    // End Get
-    // End Property
-    // #End Region
-
-    private string v_SQLHost = "localhost";
-    private string v_SQLPort = "3306";
-    private string v_SQLUser = "";
-    private string v_SQLPass = "";
-    private string v_SQLDBName = "";
-
-    public enum DB_Type
-    {
-        MySQL = 0
     }
 
     public enum ReturnState
@@ -64,78 +41,27 @@ public class SQL : IDisposable
         FatalError = 2
     }
 
-    private DB_Type v_SQLType;
+    public event SQLMessageEventHandler SQLMessage;
 
-    [Description("SQL Server selection.")]
-    public DB_Type SQLTypeServer
+    public delegate void SQLMessageEventHandler(EMessages MessageID, string OutBuf);
+
+    private readonly string _connectionString;
+    internal readonly string _database;
+
+    public SQL(string connectionString, string database)
     {
-        get
-        {
-            var SQLTypeServerRet = v_SQLType;
-            return SQLTypeServerRet;
-        }
-
-        set => v_SQLType = value;
+        _connectionString = connectionString;
+        _database = database;
     }
 
-    [Description("SQL Host name.")]
-    public string SQLHost
+    public string DBName()
     {
-        get
-        {
-            var SQLHostRet = v_SQLHost;
-            return SQLHostRet;
-        }
-
-        set => v_SQLHost = value;
+        return _database;
     }
 
-    [Description("SQL Host port.")]
-    public string SQLPort
+    internal virtual void EnsureDatabase()
     {
-        get
-        {
-            var SQLPortRet = v_SQLPort;
-            return SQLPortRet;
-        }
 
-        set => v_SQLPort = value;
-    }
-
-    [Description("SQL User name.")]
-    public string SQLUser
-    {
-        get
-        {
-            var SQLUserRet = v_SQLUser;
-            return SQLUserRet;
-        }
-
-        set => v_SQLUser = value;
-    }
-
-    [Description("SQL Password.")]
-    public string SQLPass
-    {
-        get
-        {
-            var SQLPassRet = v_SQLPass;
-            return SQLPassRet;
-        }
-
-        set => v_SQLPass = value;
-    }
-
-    [Description("SQL Database name.")]
-    public string SQLDBName
-    {
-        get
-        {
-            var SQLDBNameRet = v_SQLDBName;
-            return SQLDBNameRet;
-        }
-
-        set => v_SQLDBName = value;
     }
 
     [Description("Start up the SQL connection.")]
@@ -143,46 +69,11 @@ public class SQL : IDisposable
     {
         try
         {
-            if (SQLHost.Length < 1)
-            {
-                SQLMessage?.Invoke(EMessages.ID_Error, "You have to set the SQLHost cannot be empty");
-                return (int)ReturnState.FatalError;
-            }
-
-            if (SQLPort.Length < 1)
-            {
-                SQLMessage?.Invoke(EMessages.ID_Error, "You have to set the SQLPort cannot be empty");
-                return (int)ReturnState.FatalError;
-            }
-
-            if (SQLUser.Length < 1)
-            {
-                SQLMessage?.Invoke(EMessages.ID_Error, "You have to set the SQLUser cannot be empty");
-                return (int)ReturnState.FatalError;
-            }
-
-            if (SQLPass.Length < 1)
-            {
-                SQLMessage?.Invoke(EMessages.ID_Error, "You have to set the SQLPassword cannot be empty");
-                return (int)ReturnState.FatalError;
-            }
-
-            if (SQLDBName.Length < 1)
-            {
-                SQLMessage?.Invoke(EMessages.ID_Error, "You have to set the SQLDatabaseName cannot be empty");
-                return (int)ReturnState.FatalError;
-            }
-
-            switch (v_SQLType)
-            {
-                case DB_Type.MySQL:
-                    {
-                        MySQLConn = new MySqlConnection(string.Format("Server={0};Port={4};User ID={1};Password={2};Database={3};Compress=false;Connection Timeout=1;", SQLHost, SQLUser, SQLPass, SQLDBName, SQLPort));
-                        MySQLConn.Open();
-                        SQLMessage?.Invoke(EMessages.ID_Message, "MySQL Connection Opened Successfully [" + SQLUser + "@" + SQLHost + "]");
-                        break;
-                    }
-            }
+            _mySqlConn = new MySqlConnection(_connectionString);
+            _mySqlConn.Open();
+            EnsureDatabase();
+            _mySqlConn.ChangeDatabase(_database);
+            SQLMessage?.Invoke(EMessages.ID_Message, $"MySQL Connection Opened Successfully [{_mySqlConn.DataSource}]");
         }
         catch (MySqlException e)
         {
@@ -198,25 +89,18 @@ public class SQL : IDisposable
     {
         try
         {
-            switch (v_SQLType)
+            _mySqlConn.Close();
+            _mySqlConn.Dispose();
+            _mySqlConn = new MySqlConnection(_connectionString);
+            _mySqlConn.Open();
+            _mySqlConn.ChangeDatabase(_database);
+            if (_mySqlConn.State == ConnectionState.Open)
             {
-                case DB_Type.MySQL:
-                    {
-                        MySQLConn.Close();
-                        MySQLConn.Dispose();
-                        MySQLConn = new MySqlConnection(string.Format("Server={0};Port={4};User ID={1};Password={2};Database={3};Compress=false;Connection Timeout=1;", SQLHost, SQLUser, SQLPass, SQLDBName, SQLPort));
-                        MySQLConn.Open();
-                        if (MySQLConn.State == ConnectionState.Open)
-                        {
-                            SQLMessage?.Invoke(EMessages.ID_Message, "MySQL Connection restarted!");
-                        }
-                        else
-                        {
-                            SQLMessage?.Invoke(EMessages.ID_Error, "Unable to restart MySQL connection.");
-                        }
-
-                        break;
-                    }
+                SQLMessage?.Invoke(EMessages.ID_Message, "MySQL Connection restarted!");
+            }
+            else
+            {
+                SQLMessage?.Invoke(EMessages.ID_Error, "Unable to restart MySQL connection.");
             }
         }
         catch (MySqlException e)
@@ -235,15 +119,8 @@ public class SQL : IDisposable
         {
             // TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
             // TODO: set large fields to null.
-            switch (v_SQLType)
-            {
-                case DB_Type.MySQL:
-                    {
-                        MySQLConn.Close();
-                        MySQLConn.Dispose();
-                        break;
-                    }
-            }
+            _mySqlConn.Close();
+            _mySqlConn.Dispose();
         }
 
         _disposedValue = true;
@@ -300,47 +177,32 @@ public class SQL : IDisposable
 
     public int Query(string sqlquery, ref DataTable Result)
     {
-        switch (v_SQLType)
+        if (_mySqlConn.State != ConnectionState.Open)
         {
-            case DB_Type.MySQL:
-                {
-                    if (MySQLConn.State != ConnectionState.Open)
-                    {
-                        Restart();
-                        if (MySQLConn.State != ConnectionState.Open)
-                        {
-                            SQLMessage?.Invoke(EMessages.ID_Error, "MySQL Database Request Failed!");
-                            return (int)ReturnState.MinorError;
-                        }
-                    }
-
-                    break;
-                }
+            Restart();
+            if (_mySqlConn.State != ConnectionState.Open)
+            {
+                SQLMessage?.Invoke(EMessages.ID_Error, "MySQL Database Request Failed!");
+                return (int)ReturnState.MinorError;
+            }
         }
 
         var ExitCode = (int)ReturnState.Success;
         try
         {
-            switch (v_SQLType)
+            Monitor.Enter(_mySqlConn);
+            MySqlCommand MySQLCommand = new(sqlquery, _mySqlConn);
+            MySqlDataAdapter MySQLAdapter = new(MySQLCommand);
+            if (Result is null)
             {
-                case DB_Type.MySQL:
-                    {
-                        Monitor.Enter(MySQLConn);
-                        MySqlCommand MySQLCommand = new(sqlquery, MySQLConn);
-                        MySqlDataAdapter MySQLAdapter = new(MySQLCommand);
-                        if (Result is null)
-                        {
-                            Result = new DataTable();
-                        }
-                        else
-                        {
-                            Result.Clear();
-                        }
-
-                        MySQLAdapter.Fill(Result);
-                        break;
-                    }
+                Result = new DataTable();
             }
+            else
+            {
+                Result.Clear();
+            }
+
+            MySQLAdapter.Fill(Result);
         }
         catch (MySqlException e)
         {
@@ -350,14 +212,7 @@ public class SQL : IDisposable
         }
         finally
         {
-            switch (v_SQLType)
-            {
-                case DB_Type.MySQL:
-                    {
-                        Monitor.Exit(MySQLConn);
-                        break;
-                    }
-            }
+            Monitor.Exit(_mySqlConn);
         }
 
         return ExitCode;
@@ -365,39 +220,24 @@ public class SQL : IDisposable
 
     public void Insert(string sqlquery)
     {
-        switch (v_SQLType)
+        if (_mySqlConn.State != ConnectionState.Open)
         {
-            case DB_Type.MySQL:
-                {
-                    if (MySQLConn.State != ConnectionState.Open)
-                    {
-                        Restart();
-                        if (MySQLConn.State != ConnectionState.Open)
-                        {
-                            SQLMessage?.Invoke(EMessages.ID_Error, "MySQL Database Request Failed!");
-                            return;
-                        }
-                    }
-
-                    break;
-                }
+            Restart();
+            if (_mySqlConn.State != ConnectionState.Open)
+            {
+                SQLMessage?.Invoke(EMessages.ID_Error, "MySQL Database Request Failed!");
+                return;
+            }
         }
 
         try
         {
-            switch (v_SQLType)
-            {
-                case DB_Type.MySQL:
-                    {
-                        Monitor.Enter(MySQLConn);
-                        var MySQLTransaction = MySQLConn.BeginTransaction();
-                        MySqlCommand MySQLCommand = new(sqlquery, MySQLConn, MySQLTransaction);
-                        MySQLCommand.ExecuteNonQuery();
-                        MySQLTransaction.Commit();
-                        Console.WriteLine("transaction completed");
-                        break;
-                    }
-            }
+            Monitor.Enter(_mySqlConn);
+            var MySQLTransaction = _mySqlConn.BeginTransaction();
+            MySqlCommand MySQLCommand = new(sqlquery, _mySqlConn, MySQLTransaction);
+            MySQLCommand.ExecuteNonQuery();
+            MySQLTransaction.Commit();
+            Console.WriteLine("transaction completed");
         }
         catch (MySqlException e)
         {
@@ -406,21 +246,14 @@ public class SQL : IDisposable
         }
         finally
         {
-            switch (v_SQLType)
-            {
-                case DB_Type.MySQL:
-                    {
-                        Monitor.Exit(MySQLConn);
-                        break;
-                    }
-            }
+            Monitor.Exit(_mySqlConn);
         }
     }
 
     // TODO: Apply proper implementation as needed
     public int TableInsert(string tablename, string dbField1, string dbField1Value, string dbField2, int dbField2Value)
     {
-        MySqlCommand cmd = new("", MySQLConn);
+        MySqlCommand cmd = new("", _mySqlConn);
         cmd.Connection.Open();
         cmd.CommandText = "insert into `" + tablename + "`(`" + dbField1 + "`,`" + dbField2 + "`) " + "VALUES (@field1value, @field2value)";
         cmd.Parameters.AddWithValue("@field1value", dbField1Value);
@@ -441,7 +274,7 @@ public class SQL : IDisposable
     // TODO: Apply proper implementation as needed
     public DataSet TableSelect(string tablename, string returnfields, string dbField1, string dbField1Value)
     {
-        MySqlCommand cmd = new("", MySQLConn);
+        MySqlCommand cmd = new("", _mySqlConn);
         cmd.Connection.Open();
         cmd.CommandText = "select " + returnfields + " FROM `" + tablename + "` WHERE `" + dbField1 + "` = '@dbField1value';";
         cmd.Parameters.AddWithValue("@dbfield1value", dbField1Value);
@@ -464,38 +297,23 @@ public class SQL : IDisposable
 
     public void Update(string sqlquery)
     {
-        switch (v_SQLType)
+        if (_mySqlConn.State != ConnectionState.Open)
         {
-            case DB_Type.MySQL:
-                {
-                    if (MySQLConn.State != ConnectionState.Open)
-                    {
-                        Restart();
-                        if (MySQLConn.State != ConnectionState.Open)
-                        {
-                            SQLMessage?.Invoke(EMessages.ID_Error, "MySQL Database Request Failed!");
-                            return;
-                        }
-                    }
-
-                    break;
-                }
+            Restart();
+            if (_mySqlConn.State != ConnectionState.Open)
+            {
+                SQLMessage?.Invoke(EMessages.ID_Error, "MySQL Database Request Failed!");
+                return;
+            }
         }
 
         try
         {
-            switch (v_SQLType)
-            {
-                case DB_Type.MySQL:
-                    {
-                        Monitor.Enter(MySQLConn);
-                        MySqlCommand MySQLCommand = new(sqlquery, MySQLConn);
-                        MySqlDataAdapter MySQLAdapter = new(MySQLCommand);
-                        DataTable result = new();
-                        MySQLAdapter.Fill(result);
-                        break;
-                    }
-            }
+            Monitor.Enter(_mySqlConn);
+            MySqlCommand MySQLCommand = new(sqlquery, _mySqlConn);
+            MySqlDataAdapter MySQLAdapter = new(MySQLCommand);
+            DataTable result = new();
+            MySQLAdapter.Fill(result);
         }
         catch (MySqlException e)
         {
@@ -504,14 +322,69 @@ public class SQL : IDisposable
         }
         finally
         {
-            switch (v_SQLType)
-            {
-                case DB_Type.MySQL:
-                    {
-                        Monitor.Exit(MySQLConn);
-                        break;
-                    }
-            }
+            Monitor.Exit(_mySqlConn);
+        }
+    }
+}
+
+public class CharacterSql : SQL
+{
+    public CharacterSql(string connectionString, string database) : base(connectionString, database) { }
+
+    internal override void EnsureDatabase()
+    {
+        var show_command = _mySqlConn.CreateCommand();
+        show_command.CommandText = "SHOW DATABASES LIKE @name;";
+        show_command.Parameters.AddWithValue("name", _database);
+        var results = show_command.ExecuteReader();
+
+        var exists = results.Read();
+        results.Close();
+
+        if (!exists)
+        {
+            var create_command = _mySqlConn.CreateCommand();
+            create_command.CommandText = $"CREATE DATABASE {_database};";
+            create_command.ExecuteNonQuery();
+
+            _mySqlConn.ChangeDatabase(_database);
+
+            var init_command = _mySqlConn.CreateCommand();
+            init_command.CommandText = SqlScripts.ReadEmbeddedResource("Database", "character.sql");
+            init_command.ExecuteNonQuery();
+        }
+    }
+}
+
+public class WorldSql : SQL
+{
+    public WorldSql(string connectionString, string database) : base(connectionString, database) { }
+
+    internal override void EnsureDatabase()
+    {
+        var show_command = _mySqlConn.CreateCommand();
+        show_command.CommandText = "SHOW DATABASES LIKE @name;";
+        show_command.Parameters.AddWithValue("name", _database);
+        var results = show_command.ExecuteReader();
+
+        var exists = results.Read();
+        results.Close();
+
+        if (!exists)
+        {
+            var create_command = _mySqlConn.CreateCommand();
+            create_command.CommandText = $"CREATE DATABASE {_database};";
+            create_command.ExecuteNonQuery();
+
+            _mySqlConn.ChangeDatabase(_database);
+
+            var init_command = _mySqlConn.CreateCommand();
+            init_command.CommandText = SqlScripts.ReadEmbeddedResource("Database", "world.sql");
+            init_command.ExecuteNonQuery();
+
+            var data_command = _mySqlConn.CreateCommand();
+            data_command.CommandText = SqlScripts.ReadEmbeddedResource("Database", "world.data.sql");
+            data_command.ExecuteNonQuery();
         }
     }
 }

@@ -4,24 +4,27 @@
     "DatabaseName": "realm",
     "RealmServerEndpoint": "127.0.0.1:3724"
   },
+  "Character": {
+    "ConnectionString": "Server=localhost;Port=3306;User ID=root;Password=rootpass;Compress=false;Connection Timeout=5;",
+    "DatabaseName": "characters"
+  },
   "Cluster": {
     "ClusterServerEndpoint": "127.0.0.1:8085",
     "ClusterListenAddress": "127.0.0.1",
     "ClusterListenPort": 50001,
-    "ServerPlayerLimit": 100,
-    "AccountDatabase": "root;rootpass;localhost;3306;mangosVBaccounts;MySQL",
-    "CharacterDatabase": "root;rootpass;localhost;3306;mangosVBcharacters;MySQL",
-    "WorldDatabase": "root;rootpass;localhost;3306;mangosVBworld;MySQL"
+    "ServerPlayerLimit": 100
   },
   "World": {
     "ClusterConnectHost": "127.0.0.1",
     "ClusterConnectPort": 50001,
     "LocalConnectHost": "127.0.0.1",
     "LocalConnectPort": 50002,
-    "AccountDatabase": "root;rootpass;localhost;3306;mangosVBaccounts;MySQL",
-    "CharacterDatabase": "root;rootpass;localhost;3306;mangosVBcharacters;MySQL",
-    "WorldDatabase": "root;rootpass;localhost;3306;mangosVBworld;MySQL",
-    "Maps": [ 1, 0 ],
+    "ConnectionString": "Server=localhost;Port=3306;User ID=root;Password=rootpass;Compress=false;Connection Timeout=5;",
+    "DatabaseName": "world",
+    "Maps": [
+      1,
+      0
+    ],
     "ScriptsCompiler": [
       "System.dll",
       "System.Data.dll",
@@ -29,17 +32,15 @@
       "Common.dll",
       "Scripts.dll"
     ],
-    "VMapsEnabled": false,
+    "VMapsEnabled": true,
     "MapResolution": 256,
     "CommandCharacter": ".",
     "GlobalAuction": false,
-    "LineOfSightEnabled": false,
-    "HeightCalcEnabled": false,
-
+    "LineOfSightEnabled": true,
+    "HeightCalcEnabled": true,
     "ManaRegenerationRate": 1.0,
     "HealthRegenerationRate": 1.0,
     "XPRate": 1.0,
-
     "LogType": "COLORCONSOLE",
     "LogConfig": "CONSOLE",
     "CreateBattlegrounds": true,

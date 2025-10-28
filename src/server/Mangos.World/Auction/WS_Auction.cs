@@ -429,7 +429,7 @@ public class WS_Auction
             int mustBeUsable = packet.GetInt8();
             WorldServiceLocator.WorldServer.Log.WriteLine(LogType.DEBUG, "[{0}:{1}] CMSG_AUCTION_LIST_ITEMS [{2} ({3}-{4})]", client.IP, client.Port, Name, LevelMIN, LevelMAX);
             Packets.PacketClass response = new(Opcodes.SMSG_AUCTION_LIST_RESULT);
-            var QueryString = $"SELECT auctionhouse.* FROM {WorldServiceLocator.WorldServer.CharacterDatabase.SQLDBName}.auctionhouse, {WorldServiceLocator.WorldServer.WorldDatabase.SQLDBName}.item_template WHERE item_template.entry = auctionhouse.auction_itemId";
+            var QueryString = $"SELECT auctionhouse.* FROM {WorldServiceLocator.WorldServer.CharacterDatabase.DBName()}.auctionhouse, {WorldServiceLocator.WorldServer.WorldDatabase.DBName()}.item_template WHERE item_template.entry = auctionhouse.auction_itemId";
             if (Operators.CompareString(Name, "", TextCompare: false) != 0)
             {
                 QueryString = $"{QueryString} AND item_template.name LIKE '%{Name}%'";

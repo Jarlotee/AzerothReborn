@@ -36,7 +36,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-//using Microsoft.VisualBasic.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Mangos.World;
@@ -176,9 +175,15 @@ public class WorldServer
         Log = new BaseWriter();
         PacketHandlers = new Dictionary<Opcodes, HandlePacket>();
         Rnd = new Random();
-        AccountDatabase = new SQL();
-        CharacterDatabase = new SQL();
-        WorldDatabase = new SQL();
+        AccountDatabase = new SQL(
+            WorldServiceLocator.MangosConfiguration.Realm.ConnectionString,
+            WorldServiceLocator.MangosConfiguration.Realm.DatabaseName);
+        CharacterDatabase = new CharacterSql(
+            WorldServiceLocator.MangosConfiguration.Character.ConnectionString,
+            WorldServiceLocator.MangosConfiguration.Character.DatabaseName);
+        WorldDatabase = new WorldSql(
+            WorldServiceLocator.MangosConfiguration.World.ConnectionString,
+            WorldServiceLocator.MangosConfiguration.World.DatabaseName);
         this.cluster = cluster;
     }
 
@@ -196,48 +201,7 @@ public class WorldServer
                 configuration.LineOfSightEnabled = false;
                 configuration.HeightCalcEnabled = false;
             }
-            var AccountDBSettings = Strings.Split(configuration.AccountDatabase, ";");
-            if (AccountDBSettings.Length == 6)
-            {
-                AccountDatabase.SQLDBName = AccountDBSettings[4];
-                AccountDatabase.SQLHost = AccountDBSettings[2];
-                AccountDatabase.SQLPort = AccountDBSettings[3];
-                AccountDatabase.SQLUser = AccountDBSettings[0];
-                AccountDatabase.SQLPass = AccountDBSettings[1];
-                AccountDatabase.SQLTypeServer = (SQL.DB_Type)Conversion.Int(Enum.Parse(typeof(SQL.DB_Type), AccountDBSettings[5]));
-            }
-            else
-            {
-                Console.WriteLine("Invalid connect string for the account database!");
-            }
-            var CharacterDBSettings = Strings.Split(configuration.CharacterDatabase, ";");
-            if (CharacterDBSettings.Length == 6)
-            {
-                CharacterDatabase.SQLDBName = CharacterDBSettings[4];
-                CharacterDatabase.SQLHost = CharacterDBSettings[2];
-                CharacterDatabase.SQLPort = CharacterDBSettings[3];
-                CharacterDatabase.SQLUser = CharacterDBSettings[0];
-                CharacterDatabase.SQLPass = CharacterDBSettings[1];
-                CharacterDatabase.SQLTypeServer = (SQL.DB_Type)Conversion.Int(Enum.Parse(typeof(SQL.DB_Type), CharacterDBSettings[5]));
-            }
-            else
-            {
-                Console.WriteLine("Invalid connect string for the character database!");
-            }
-            var WorldDBSettings = Strings.Split(configuration.WorldDatabase, ";");
-            if (WorldDBSettings.Length == 6)
-            {
-                WorldDatabase.SQLDBName = WorldDBSettings[4];
-                WorldDatabase.SQLHost = WorldDBSettings[2];
-                WorldDatabase.SQLPort = WorldDBSettings[3];
-                WorldDatabase.SQLUser = WorldDBSettings[0];
-                WorldDatabase.SQLPass = WorldDBSettings[1];
-                WorldDatabase.SQLTypeServer = (SQL.DB_Type)Conversion.Int(Enum.Parse(typeof(SQL.DB_Type), WorldDBSettings[5]));
-            }
-            else
-            {
-                Console.WriteLine("Invalid connect string for the world database!");
-            }
+
             WorldServiceLocator.WSMaps.RESOLUTION_ZMAP = checked(configuration.MapResolution - 1);
             if (WorldServiceLocator.WSMaps.RESOLUTION_ZMAP < 63)
             {
@@ -376,26 +340,6 @@ public class WorldServer
             Console.ReadKey();
         }
         WorldDatabase.Update("SET NAMES 'utf8';");
-        var areDbVersionsOk = true;
-        if (!WorldServiceLocator.CommonGlobalFunctions.CheckRequiredDbVersion(AccountDatabase, ServerDb.Realm))
-        {
-            areDbVersionsOk = false;
-        }
-        if (!WorldServiceLocator.CommonGlobalFunctions.CheckRequiredDbVersion(CharacterDatabase, ServerDb.Character))
-        {
-            areDbVersionsOk = false;
-        }
-        if (!WorldServiceLocator.CommonGlobalFunctions.CheckRequiredDbVersion(WorldDatabase, ServerDb.World))
-        {
-            areDbVersionsOk = false;
-        }
-        if (!areDbVersionsOk)
-        {
-            Console.WriteLine("*************************");
-            Console.WriteLine("* Press any key to exit *");
-            Console.WriteLine("*************************");
-            Console.ReadKey();
-        }
         await WorldServiceLocator.WSDBCDatabase.InitializeInternalDatabaseAsync();
         WorldServiceLocator.WSHandlers.IntializePacketHandlers();
         ALLQUESTS.LoadAllQuests();
