@@ -36,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -1657,7 +1658,7 @@ public class WS_Creatures
             {
                 if (CellX != WorldServiceLocator.WSMaps.GetMapTileX(positionX) || CellY != WorldServiceLocator.WSMaps.GetMapTileY(positionY))
                 {
-                    if (WorldServiceLocator.WSMaps.Maps[MapID].Tiles != null && !Information.IsNothing(WorldServiceLocator.WSMaps.Maps[MapID].Tiles[CellX, CellY].CreaturesHere.Remove(GUID)))
+                    if (WorldServiceLocator.WSMaps.Maps[MapID].Tiles != null && WorldServiceLocator.WSMaps.Maps[MapID].Tiles[CellX, CellY].CreaturesHere.Any())
                     {
                         WorldServiceLocator.WSMaps.Maps[MapID].Tiles[CellX, CellY].CreaturesHere.Remove(GUID);
                     }
