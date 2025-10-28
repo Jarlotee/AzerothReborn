@@ -14,6 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\..\.client\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Mangos.Cluster\Mangos.Cluster.csproj" />
     <ProjectReference Include="..\Mangos.Configuration\Mangos.Configuration.csproj" />
     <ProjectReference Include="..\Mangos.Domain\Mangos.Domain.csproj" />
