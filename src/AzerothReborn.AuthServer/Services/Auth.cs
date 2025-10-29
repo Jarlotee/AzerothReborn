@@ -11,6 +11,7 @@ internal class Auth : IHostedService
     private readonly Tcp.TcpServer _tcpServer;
     private readonly Data.Auth.Context _context;
     private readonly Configuration.Server _config;
+    private readonly CancellationTokenSource _cancellationSource;
 
     public Auth(
         ILogger<Auth> logger,
@@ -22,6 +23,7 @@ internal class Auth : IHostedService
         _tcpServer = tcpServer;
         _context = context;
         _config = config.Value;
+        _cancellationSource = new CancellationTokenSource();
     }
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -31,16 +33,17 @@ internal class Auth : IHostedService
         // logger.Trace(@"|_|  |_\__,_|_|\_|\___|\___/|___/              ");
         // logger.Trace("                                                ");
 
-        _logger.LogInformation($"Update Auth Database");
+        _logger.LogInformation($"Updating Auth Database");
         await _context.Database.MigrateAsync();
 
         _logger.LogInformation("Starting TCP server");
-        await _tcpServer.RunAsync(_config.Endpoint);
+        await _tcpServer.RunAsync(_config.Endpoint, _cancellationSource.Token);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Stopping AuthServer");
+        _cancellationSource.Cancel();
 
         return Task.CompletedTask;
     }
