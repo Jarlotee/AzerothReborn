@@ -38,7 +38,7 @@ public sealed class TcpServer
             return;
         }
 
-        _logger.LogInformation($"Tcp client was conntected {endpoint}");
+        _logger.LogInformation($"Tcp client was connected {endpoint}");
         try
         {
             using var scope = _factory.CreateScope();
