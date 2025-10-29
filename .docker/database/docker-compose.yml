@@ -1,9 +1,11 @@
 services:
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql
     restart: unless-stopped
     ports:
-      - 3306:3306
+      - 1433:1433
     environment:
-      MARIADB_ROOT_PASSWORD: "rootpass"
+      MSSQL_SA_PASSWORD: 5@_password
+      ACCEPT_EULA: Y
+

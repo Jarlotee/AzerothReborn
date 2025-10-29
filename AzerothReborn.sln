@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E7C68D49-7027-476B-B6C5-50C3D55B65C3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmServer", "src\RealmServer\RealmServer.csproj", "{E1667915-B573-453F-8FDB-D70599824284}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzerothReborn.Data", "src\AzerothReborn.Data\AzerothReborn.Data.csproj", "{8426AE0E-4BA6-47D0-87D4-1F75F4F1A22A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzerothReborn.AuthServer", "src\AzerothReborn.AuthServer\AzerothReborn.AuthServer.csproj", "{CC1BAC57-E575-40EE-A006-E936AF540B5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzerothReborn.Tcp", "src\AzerothReborn.Tcp\AzerothReborn.Tcp.csproj", "{4BDC868B-4F98-4629-A368-1DBB40347202}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,12 +20,22 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E1667915-B573-453F-8FDB-D70599824284}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1667915-B573-453F-8FDB-D70599824284}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E1667915-B573-453F-8FDB-D70599824284}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E1667915-B573-453F-8FDB-D70599824284}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8426AE0E-4BA6-47D0-87D4-1F75F4F1A22A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8426AE0E-4BA6-47D0-87D4-1F75F4F1A22A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8426AE0E-4BA6-47D0-87D4-1F75F4F1A22A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8426AE0E-4BA6-47D0-87D4-1F75F4F1A22A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC1BAC57-E575-40EE-A006-E936AF540B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC1BAC57-E575-40EE-A006-E936AF540B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC1BAC57-E575-40EE-A006-E936AF540B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC1BAC57-E575-40EE-A006-E936AF540B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BDC868B-4F98-4629-A368-1DBB40347202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BDC868B-4F98-4629-A368-1DBB40347202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BDC868B-4F98-4629-A368-1DBB40347202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BDC868B-4F98-4629-A368-1DBB40347202}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{E1667915-B573-453F-8FDB-D70599824284} = {E7C68D49-7027-476B-B6C5-50C3D55B65C3}
+		{8426AE0E-4BA6-47D0-87D4-1F75F4F1A22A} = {4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}
+		{CC1BAC57-E575-40EE-A006-E936AF540B5B} = {4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}
+		{4BDC868B-4F98-4629-A368-1DBB40347202} = {4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}
 	EndGlobalSection
 EndGlobal
