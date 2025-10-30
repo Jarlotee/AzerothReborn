@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzerothReborn.AuthServer", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzerothReborn.Tcp", "src\AzerothReborn.Tcp\AzerothReborn.Tcp.csproj", "{4BDC868B-4F98-4629-A368-1DBB40347202}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzerothReborn.RealmServer", "src\AzerothReborn.RealmServer\AzerothReborn.RealmServer.csproj", "{B1D6C2DD-F61C-4315-96EE-A1C8B4E8C92F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,10 +34,15 @@ Global
 		{4BDC868B-4F98-4629-A368-1DBB40347202}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BDC868B-4F98-4629-A368-1DBB40347202}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BDC868B-4F98-4629-A368-1DBB40347202}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1D6C2DD-F61C-4315-96EE-A1C8B4E8C92F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1D6C2DD-F61C-4315-96EE-A1C8B4E8C92F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1D6C2DD-F61C-4315-96EE-A1C8B4E8C92F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1D6C2DD-F61C-4315-96EE-A1C8B4E8C92F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8426AE0E-4BA6-47D0-87D4-1F75F4F1A22A} = {4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}
 		{CC1BAC57-E575-40EE-A006-E936AF540B5B} = {4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}
 		{4BDC868B-4F98-4629-A368-1DBB40347202} = {4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}
+		{B1D6C2DD-F61C-4315-96EE-A1C8B4E8C92F} = {4FE6F16C-533F-4D73-BF52-DE27A3C3A9C5}
 	EndGlobalSection
 EndGlobal
