@@ -1,16 +1,11 @@
 namespace AzerothReborn.RealmServer.Requests;
 
-internal sealed class CMSG_PING : IRequestMessage<CMSG_PING>
+internal class CMSG_PING
 {
-    public required uint Payload { get; init; }
+    public uint Payload { get; private set; }
 
-    public static Network.Opcodes Opcode => Network.Opcodes.CMSG_PING;
-
-    public static CMSG_PING Read(Network.PacketReader reader)
+    public CMSG_PING(Network.PacketReader reader)
     {
-        return new CMSG_PING()
-        {
-            Payload = reader.UInt32()
-        };
+        Payload = reader.GetUInt32();
     }
 }

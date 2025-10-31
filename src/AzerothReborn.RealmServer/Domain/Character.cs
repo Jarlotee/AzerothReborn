@@ -1,4 +1,5 @@
 using AzerothReborn.RealmServer.Reference;
+using AzerothReborn.RealmServer.Server;
 
 namespace AzerothReborn.RealmServer.Domain;
 

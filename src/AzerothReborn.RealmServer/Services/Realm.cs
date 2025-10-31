@@ -30,6 +30,8 @@ internal class Realm : IHostedService
     }
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        var startTime = DateTime.UtcNow;
+
         // logger.Trace(@" __  __      _  _  ___  ___  ___               ");
         // logger.Trace(@"|  \/  |__ _| \| |/ __|/ _ \/ __|   We Love    ");
         // logger.Trace(@"| |\/| / _` | .` | (_ | (_) \__ \   Vanilla Wow");
@@ -42,9 +44,6 @@ internal class Realm : IHostedService
         _logger.LogInformation("Loading DBC files");
         await _loader.LoadAsync();
 
-        _logger.LogInformation("Starting TCP server");
-        await _tcpServer.RunAsync(_config.Endpoint, _cancellationSource.Token);
-
         // try
         // {
         //     // Set all characters offline
@@ -54,8 +53,14 @@ internal class Realm : IHostedService
         // {
         //     WorldCluster.Log.WriteLine(LogType.FAILED, "Internal database initialization failed! [{0}]{1}{2}", e.Message, Constants.vbCrLf, e.ToString());
         // }
-        
 
+        // _clusterServiceLocator.WorldServerClass.Start(); // renamed to Cluster
+
+        _logger.LogInformation("Load Time: {0} seconds", (DateTime.UtcNow - startTime).TotalSeconds);
+        _logger.LogInformation("Used memory: {0} MB", GC.GetTotalMemory(false) / 1e+6);
+
+        _logger.LogInformation("Starting TCP server");
+        await _tcpServer.RunAsync(_config.Endpoint, _cancellationSource.Token);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -66,15 +71,6 @@ internal class Realm : IHostedService
         return Task.CompletedTask;
     }
 }
-
-// public async Task StartAsync()
-//     {
-//         _clusterServiceLocator.WcHandlers.IntializePacketHandlers();
-//         _clusterServiceLocator.WorldServerClass.Start(); // renamed to Cluster
-
-//         Log.WriteLine(LogType.INFORMATION, "Load Time: {0}", Strings.Format(DateAndTime.DateDiff(DateInterval.Second, DateAndTime.Now, DateAndTime.Now), "0 seconds"));
-//         Log.WriteLine(LogType.INFORMATION, "Used memory: {0}", Strings.Format(GC.GetTotalMemory(false), "### ### ##0 bytes"));
-//     }
 
 //     public void WaitConsoleCommand()
 //     {

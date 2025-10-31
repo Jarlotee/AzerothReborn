@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Numerics;
 using Microsoft.Extensions.Logging;
 
 namespace AzerothReborn.RealmServer.Domain;
@@ -14,7 +15,7 @@ public class Client
 
     public Character? Character;
 
-    public uint Index { get; set; }
+    public uint M_Seed { get; private set; } 
     public string? IP { get; set; }
     public uint Port { get; set; }
     public string? Account { get; set; }
@@ -25,6 +26,8 @@ public class Client
     public Client(ILogger<Client> logger)
     {
         _logger = logger;
+        var random = new Random();
+        M_Seed = (uint)random.NextInt64();
     }
 
     public void DecodePacketHeader(Span<byte> data)
@@ -63,6 +66,12 @@ public class Client
     }
 
     public bool IsEncryptionEnabled() => _packetEncryption.IsEncryptionEnabled;
+
+    public void SetEncryptionHash(BigInteger K)
+    {
+        _packetEncryption.Hash = K.ToByteArray().Take(40).ToArray();
+        _packetEncryption.IsEncryptionEnabled = true;
+    }
 
     public Task OnConnectAsync()
     {

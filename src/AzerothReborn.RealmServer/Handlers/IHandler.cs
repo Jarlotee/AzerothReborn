@@ -1,6 +1,6 @@
 namespace AzerothReborn.RealmServer.Handlers;
 
-internal interface IHandler<TRequest> where TRequest : Requests.IRequestMessage<TRequest>
+internal interface IHandler
 {
-    Task<Network.HandlerResult> ExectueAsync(TRequest request);
+    Task<List<Responses.IResponse>> HandleAsync(Network.PacketReader reader, Domain.Client client);
 }

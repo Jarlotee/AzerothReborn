@@ -5,6 +5,10 @@ Consider:
 * Move AuthServer Network objects to a central lib, just for colocation and consolidation for things like generics, opcodes, etc.
 
 
+<!--
+    Need implement Petitions messages, check mangos prob
+-->
+
 <!-- 
 
 Find a home
@@ -37,3 +41,31 @@ public void InitializeBattlegrounds()
 
         _clusterServiceLocator.WorldCluster.Log.WriteLine(LogType.INFORMATION, "World: {0} Battlegrounds Initialized.", mySqlQuery.Rows.Count);
     } -->
+
+<!-- 
+    probably on an abstract class, find a home
+
+    
+    public void OnUnhandledPacket(PacketClass packet, ClientClass client)
+    {
+        _clusterServiceLocator.WorldCluster.Log.WriteLine(LogType.WARNING, "[{0}:{1}] {2} [Unhandled Packet]", client.IP, client.Port, packet.OpCode);
+    }
+
+    public void OnClusterPacket(PacketClass packet, ClientClass client)
+    {
+        _clusterServiceLocator.WorldCluster.Log.WriteLine(LogType.WARNING, "[{0}:{1}] {2} [Redirected Packet]", client.IP, client.Port, packet.OpCode);
+        if (client.Character is null || client.Character.IsInWorld == false)
+        {
+            _clusterServiceLocator.WorldCluster.Log.WriteLine(LogType.WARNING, "[{0}:{1}] Unknown Opcode 0x{2:X} [{2}], DataLen={4}", client.IP, client.Port, packet.OpCode, Constants.vbCrLf, packet.Length);
+            _clusterServiceLocator.Packets.DumpPacket(packet.Data, client);
+        }
+        else
+        {
+            client.Character.GetWorld.ClientPacket(client.Index, packet.Data);
+        }
+    } -->
+
+
+    Request => Parses the Message
+    Handler => Runs the  parserer and generates responses
+    Response => Encodes the response

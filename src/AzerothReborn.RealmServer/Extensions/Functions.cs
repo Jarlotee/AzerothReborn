@@ -4,11 +4,6 @@ namespace AzerothReborn.RealmServer.Extensions;
 
 public static class Functions
 {
-    public static int GetTime()
-    {
-        return Environment.TickCount;
-    }
-
     public static string UppercaseFirstLetter(string val)
     {
         if (string.IsNullOrEmpty(val))
@@ -247,6 +242,28 @@ public static class Functions
                 {
                     return manaType;
                 }
+        }
+    }
+
+    public static uint Ip2Int(string ip)
+    {
+        if (ip.Split(".").Length != 4)
+        {
+            return 0U;
+        }
+
+        try
+        {
+            var ipBytes = new byte[4];
+            ipBytes[0] = byte.Parse(ip.Split(".")[3]);
+            ipBytes[1] = byte.Parse(ip.Split(".")[2]);
+            ipBytes[2] = byte.Parse(ip.Split(".")[1]);
+            ipBytes[3] = byte.Parse(ip.Split(".")[0]);
+            return BitConverter.ToUInt32(ipBytes, 0);
+        }
+        catch
+        {
+            return 0U;
         }
     }
 }

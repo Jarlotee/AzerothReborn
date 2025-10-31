@@ -1,31 +1,32 @@
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Net.Sockets;
-using AzerothReborn.RealmServer.Domain;
+using AzerothReborn.RealmServer.Handlers;
 using AzerothReborn.Tcp;
 
 namespace AzerothReborn.RealmServer.Network;
 
 internal sealed class RealmTcpConnection : ITcpConnection
 {
+
     private const int MAX_PACKET_LENGTH = 10000;
 
-    private readonly Domain.Client legacyClientClass;
-    private readonly IHandlerDispatcher[] dispatchers;
+    private readonly HandlerProvider _provider;
+
+    private readonly Domain.Client _clientClass;
 
     private readonly MemoryPool<byte> memoryPool = MemoryPool<byte>.Shared;
 
-    public RealmTcpConnection(Domain.Client legacyClientClass, IEnumerable<IHandlerDispatcher> dispatchers)
+    public RealmTcpConnection(Domain.Client legacyClientClass, HandlerProvider provider)
     {
-        this.legacyClientClass = legacyClientClass;
-
-        this.dispatchers = dispatchers.ToArray();
+        _clientClass = legacyClientClass;
+        _provider = provider;
     }
 
     public async Task ExecuteAsync(Socket socket, CancellationToken cancellationToken)
     {
-        legacyClientClass.Socket = socket;
-        await legacyClientClass.OnConnectAsync();
+        _clientClass.Socket = socket;
+        await _clientClass.OnConnectAsync();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -42,31 +43,29 @@ internal sealed class RealmTcpConnection : ITcpConnection
 
         var opcode = (Opcodes)BinaryPrimitives.ReadUInt32LittleEndian(header.Span.Slice(2));
 
-        var dispatcher = dispatchers.FirstOrDefault(x => x.Opcode == opcode);
-        if (dispatcher != null)
+        var handler = _provider.GetHandlerForOpcode(opcode);
+        if (handler != null)
         {
-            await ExecuteHandlerAsync(dispatcher, body, socket, cancellationToken);
+            await ExecuteHandlerAsync(handler, body, socket, cancellationToken);
         }
         else
         {
-            ExecuteLegacyHandler(memoryOwner.Memory.Slice(0, header.Length + body.Length));
+            throw new NotImplementedException("Should not happen");
         }
     }
 
-    private async Task ExecuteHandlerAsync(IHandlerDispatcher dispatcher, Memory<byte> body, Socket socket, CancellationToken cancellationToken)
+    private async Task ExecuteHandlerAsync(IHandler handler, Memory<byte> body, Socket socket, CancellationToken cancellationToken)
     {
-        using var result = await dispatcher.ExectueAsync(new PacketReader(body));
+        var responses = await handler.HandleAsync(new PacketReader(body), _clientClass);
         using var memoryOwner = memoryPool.Rent(MAX_PACKET_LENGTH);
-        foreach (var response in result.GetResponseMessages())
+        foreach (var response in responses)
         {
-            await SendAsync(socket, memoryOwner.Memory, response, cancellationToken);
+            var packetWriter = new PacketWriter(memoryOwner.Memory, response.GetOpcode());
+            response.Write(packetWriter);
+            var packet = packetWriter.ToPacket();
+            _clientClass.EncodePacketHeader(packet.Span);
+            await SendAsync(socket, packet, cancellationToken);
         }
-    }
-
-    private void ExecuteLegacyHandler(ReadOnlyMemory<byte> packet)
-    {
-        var legacyPacket = new PacketClass(packet.ToArray());
-        legacyClientClass.OnPacket(legacyPacket);
     }
 
     private async ValueTask WaitForNextPacket(Socket socket, CancellationToken cancellationToken)
@@ -78,7 +77,7 @@ internal sealed class RealmTcpConnection : ITcpConnection
     {
         var header = buffer.Slice(0, 6);
         await ReadAsync(socket, header, cancellationToken);
-        legacyClientClass.DecodePacketHeader(header.Span);
+        _clientClass.DecodePacketHeader(header.Span);
         return header;
     }
 
@@ -88,15 +87,6 @@ internal sealed class RealmTcpConnection : ITcpConnection
         var body = buffer.Slice(6, length);
         await ReadAsync(socket, body, cancellationToken);
         return body;
-    }
-
-    private async ValueTask SendAsync(Socket socket, Memory<byte> buffer, Responses.IResponseMessage response, CancellationToken cancellationToken)
-    {
-        var packetWriter = new PacketWriter(buffer, response.Opcode);
-        response.Write(packetWriter);
-        var packet = packetWriter.ToPacket();
-        legacyClientClass.EncodePacketHeader(packet.Span);
-        await SendAsync(socket, packet, cancellationToken);
     }
 
     private async ValueTask ReadAsync(Socket socket, Memory<byte> buffer, CancellationToken cancellationToken)

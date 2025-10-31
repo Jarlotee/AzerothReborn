@@ -1,13 +1,21 @@
 namespace AzerothReborn.RealmServer.Responses;
 
-internal sealed class SMSG_PONG : IResponseMessage
+internal class SMSG_PONG : IResponse
 {
-    public uint Payload { get; init; }
+    private readonly uint _payload;
 
-    public Network.Opcodes Opcode => Network.Opcodes.SMSG_PONG;
+    public SMSG_PONG(uint payload)
+    {
+        _payload = payload;
+    }
+
+    public Network.Opcodes GetOpcode()
+    {
+        return Network.Opcodes.SMSG_PONG;
+    }
 
     public void Write(Network.PacketWriter writer)
     {
-        writer.UInt32(Payload);
+        writer.AddUInt32(_payload);
     }
 }
