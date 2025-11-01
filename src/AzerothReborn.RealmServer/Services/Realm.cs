@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,22 +11,22 @@ internal class Realm : IHostedService
     private readonly ILogger _logger;
     private readonly Tcp.TcpServer _tcpServer;
     private readonly ClientData.Loader _loader;
-    private readonly Data.Auth.Context _context;
     private readonly Configuration.Server _config;
     private readonly CancellationTokenSource _cancellationSource;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     public Realm(
         ILogger<Realm> logger,
         Tcp.TcpServer tcpServer,
         ClientData.Loader loader,
-        Data.Auth.Context context,
-        IOptions<Configuration.Server> config)
+        IOptions<Configuration.Server> config,
+        IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _tcpServer = tcpServer;
         _loader = loader;
-        _context = context;
         _config = config.Value;
+        _scopeFactory = scopeFactory;
         _cancellationSource = new CancellationTokenSource();
     }
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -38,8 +39,21 @@ internal class Realm : IHostedService
         // logger.Trace(@"|_|  |_\__,_|_|\_|\___|\___/|___/              ");
         // logger.Trace("                                                ");
 
-        // _logger.LogInformation($"Updating Auth Database");
-        // await _context.Database.MigrateAsync();
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        using var authContext = scope.ServiceProvider.GetService<Data.Auth.Context>();
+
+        if (authContext is null)
+            throw new ApplicationException("Auth DbContext should not be null, did you forget to register it?");
+
+        _logger.LogInformation($"Updating Auth Database");
+        await authContext.Database.MigrateAsync();
+
+        using var characterContext = scope.ServiceProvider.GetService<Data.Character.Context>();
+        if (characterContext is null)
+            throw new ApplicationException("Auth DbContext should not be null, did you forget to register it?");
+
+        _logger.LogInformation($"Updating Character Database");
+        await characterContext.Database.MigrateAsync();  
 
         _logger.LogInformation("Loading DBC files");
         await _loader.LoadAsync();

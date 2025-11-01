@@ -12,5 +12,8 @@ internal static class Database
     {
         builder.Services.AddDbContext<Data.Auth.Context>(o =>
             o.UseSqlServer(builder.Configuration.GetConnectionString("Auth")));
+
+        builder.Services.AddDbContext<Data.Character.Context>(o =>
+           o.UseSqlServer(builder.Configuration.GetConnectionString("Character")));
     }
 }
